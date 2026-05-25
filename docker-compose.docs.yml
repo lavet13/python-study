@@ -1,0 +1,21 @@
+services:
+  docs:
+    build:
+      context: .
+      dockerfile: Dockerfile.docs
+    volumes:
+      - ./:/workspace
+    working_dir: /workspace
+
+  node:
+    build:
+      context: ./templates
+      dockerfile: Dockerfile.node
+    volumes:
+      - ./templates:/app
+      - /app/node_modules # anonymous volume — same trick as prisma
+
+  repomix:
+    image: ghcr.io/yamadashy/repomix
+    volumes:
+      - ./:/app     # mounts entire project into /app (repomix's working directory)

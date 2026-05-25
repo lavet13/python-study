@@ -1,0 +1,21 @@
+# Contains Pandoc + Python + python-docx + docxcompose for the full pipeline.
+# Rebuild after changes: docker compose -f docker-compose.docs.yml build
+
+FROM pandoc/latex:latest
+
+# Alpine Linux uses apk as its package manager
+RUN apk add --no-cache \
+    fontconfig \
+    font-dejavu \
+    msttcorefonts-installer \
+    python3 \
+    py3-pip \
+    && update-ms-fonts \
+    && fc-cache -f
+
+# python-docx: reads/writes .docx files
+# docxcompose: merges two .docx files correctly, handling numbering and relationships
+RUN pip3 install python-docx docxcompose --break-system-packages
+
+WORKDIR /workspace
+CMD ["pandoc", "--version"]

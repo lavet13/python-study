@@ -1,0 +1,16 @@
+FROM node:22-slim
+
+WORKDIR /app
+
+# Copy only package.json first — Docker caches this layer separately.
+# npm install only reruns when package.json changes, not when make_reference.js changes.
+COPY package.json .
+RUN npm install
+
+# Script is copied in but will be overridden by the volume mount —
+# this just ensures the image works standalone too
+COPY make_reference.js .
+
+# node as entrypoint means: docker run ... make_reference.js
+# works exactly like the pandoc image
+ENTRYPOINT ["node"]
