@@ -1,1 +1,5 @@
 codebase.md
+.venv/
+__pycache__/
+moscow_housing_study.csv
+*.pyc
