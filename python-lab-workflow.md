@@ -91,15 +91,47 @@ bash lab-XX/build.sh
 
 ## Курсовой workflow
 
-After all labs are done:
+### Step 1 — Start the session and set context
 
 ```
 /python
-@progress.md all labs are complete. Now I need to write the Курсовой.
-I have a new dataset: @курсовой_dataset.csv
-Help me plan the structure of the Курсовой and what analysis
-to perform on this dataset.
+@progress.md all 4 labs complete. Starting Курсовой now.
+@AI_Курсовая_Работа_Dataset_Generation.docx this is the dataset
+analysis document from deep research. It contains the generation
+script, 6 analytical questions, and the full ML pipeline description.
+I have already generated moscow_housing_study.csv from the script.
+Help me plan the Курсовой structure and what to tackle first.
 ```
+
+### Step 2 — Feed the dataset
+
+```
+@moscow_housing_study.csv here is the dataset. Describe what you see.
+```
+
+### Step 3 — Confirm the structure
+
+```
+@term-paper-structure.md this is the planned structure for the Курсовой.
+Does it need adjusting based on the dataset and analytical questions?
+```
+
+### During the Курсовой — reference the deep search document anytime
+
+```
+# When you need the clustering technique explained:
+@AI_Курсовая_Работа_Dataset_Generation.docx explain the clustering section
+
+# When you need the imputation approach:
+@AI_Курсовая_Работа_Dataset_Generation.docx explain missing value imputation
+
+# When you need the full ML pipeline:
+@AI_Курсовая_Работа_Dataset_Generation.docx explain the supervised learning section
+```
+
+The deep research document has exact Python snippets for each technique
+aligned to your specific dataset columns — use it as a persistent reference
+throughout the Курсовой rather than feeding it only once.
 
 ---
 
