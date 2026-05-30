@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
-LAB_NUMBER="3"
-LAB_TITLE="Основы машинного обучения (часть 1)"
+LAB_NUMBER="—"
+LAB_TITLE="Разработка прикладных решений на Python с применением методов машинного обучения на данных рынка недвижимости Москвы"
 SUBJECT="Разработка прикладных решений на Python"
 GROUP="ИТИм-25"
 STUDENT="Скиндер И.П."
@@ -10,9 +10,9 @@ TEACHER="доц. Харитонов Ю.Е."
 CITY="Донецк"
 YEAR="2026"
 
-REPORT="lab-03/report.md"
-CONTENT_TMP="lab-03/_content_tmp.docx"
-OUTPUT="lab-03/Отчет.docx"
+REPORT="term-paper/report.md"
+CONTENT_TMP="term-paper/_content_tmp.docx"
+OUTPUT="term-paper/Курсовая.docx"
 REFERENCE="templates/reference.docx"
 
 echo "[1/2] Converting report.md to content.docx via Pandoc..."
@@ -21,7 +21,7 @@ docker compose -f docker-compose.docs.yml run --rm docs \
   "$REPORT" \
   -o "$CONTENT_TMP" \
   --reference-doc="$REFERENCE" \
-  --resource-path="lab-03"
+  --resource-path="term-paper"
 
 echo "[2/2] Merging title page with content..."
 

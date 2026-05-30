@@ -22,7 +22,7 @@ echo "Generating $OUTPUT..."
 
 docker compose -f docker-compose.docs.yml run --rm repomix \
   --style markdown \
-  --ignore "*.md" \
+  --ignore "*.md,*.csv,*.docx,SII_Osnovy_Python.txt,SII_python_Colab_praktika.txt" \
   --output "$OUTPUT" \
   --parsable-style \
   --header-text "$HEADER"
