@@ -10,11 +10,24 @@ df = pd.read_csv("../../moscow_housing_study.csv", delimiter=",")
 # Работаем с ценами — они имеют выбросы
 df_price = df.copy()
 
-# 1. Boxplot до очистки
-sns.boxplot(data=df_price, y="price_rub")
-plt.title("Ящик с усами: price_rub (до фильтрации)")
-plt.savefig("plot_07_boxplot_before.png", dpi=100, bbox_inches="tight")
-plt.close()
+# Вычислим границу для отображения заранее — одинаковая для всех трёх графиков
+display_max = df_price["price_rub"].quantile(0.98)  # показываем 98% данных
+
+def plot_price_hist(data, title, filename, left, right, display_max):
+    fig, ax = plt.subplots(figsize=(7, 4))
+    ax.hist(data["price_rub"] / 1e6, bins=60, color="steelblue", edgecolor="none")
+    # Вертикальные линии — границы фильтрации
+    ax.axvline(right / 1e6, color="red", linewidth=1.5, linestyle="--",
+               label=f"Граница: {right/1e6:.1f} млн")
+    ax.set_xlabel("price_rub (млн руб.)")
+    ax.set_ylabel("Количество квартир")
+    ax.set_xlim(0, display_max / 1e6)
+    ax.set_title(title)
+    ax.legend()
+    plt.tight_layout()
+    plt.savefig(filename, dpi=100, bbox_inches="tight")
+    plt.close()
+
 
 # ── 2. Правило трёх сигм ─────────────────────────────────────────────────────
 m = df_price["price_rub"].mean()
@@ -24,12 +37,15 @@ right_1 = m + 3 * s
 
 print(f"\nСпособ 1 (3σ) — диапазон: [{left_1:,.0f}; {right_1:,.0f}]")
 
+# ── plot_07: до фильтрации ────────────────────────────────────────────────────
+plot_price_hist(df_price, "Распределение цен (до фильтрации)",
+               "plot_07_boxplot_before.png", left_1, right_1, display_max)
+
 df_clean1 = df_price[(df_price["price_rub"] >= left_1) & (df_price["price_rub"] <= right_1)]
 
-sns.boxplot(data=df_clean1, y="price_rub")
-plt.title("После удаления по правилу 3σ")
-plt.savefig("plot_08_boxplot_3sigma.png", dpi=100, bbox_inches="tight")
-plt.close()
+# ── plot_08: после 3σ ─────────────────────────────────────────────────────────
+plot_price_hist(df_clean1, "Распределение цен (после правила 3σ)",
+               "plot_08_boxplot_3sigma.png", left_1, right_1, display_max)
 
 # ── 3. Метод IQR ─────────────────────────────────────────────────────────────
 Q1 = df_price["price_rub"].quantile(0.25)
@@ -42,10 +58,9 @@ print(f"Способ 2 (IQR) — диапазон: [{left_2:,.0f}; {right_2:,.0f
 
 df_clean2 = df_price[(df_price["price_rub"] >= left_2) & (df_price["price_rub"] <= right_2)]
 
-sns.boxplot(data=df_clean2, y="price_rub")
-plt.title("После удаления по методу IQR")
-plt.savefig("plot_09_boxplot_iqr.png", dpi=100, bbox_inches="tight")
-plt.close()
+# ── plot_09: после IQR ────────────────────────────────────────────────────────
+plot_price_hist(df_clean2, "Распределение цен (после метода IQR)",
+               "plot_09_boxplot_iqr.png", left_2, right_2, display_max)
 
 print(f"\nОсталось после 3σ: {len(df_clean1)} строк")
 print(f"Осталось после IQR: {len(df_clean2)} строк")
