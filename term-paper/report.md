@@ -356,9 +356,9 @@ sns.displot(df["full_area"], bins=30)
 sns.displot(df["full_area"], kind="kde")
 ```
 
-![Распределение общей площади](lab-02/plot_01_displot_full_area.png)
+![Рисунок 1 - Распределение общей площади](lab-02/plot_01_displot_full_area.png)
 
-![Функция плотности full_area](lab-02/plot_02_kde_full_area.png)
+![Рисунок 2 - Функция плотности full_area](lab-02/plot_02_kde_full_area.png)
 
 `displot()` строит гистограмму распределения числового признака,
 разбивая диапазон значений на равные интервалы (`bins`) и подсчитывая
@@ -378,7 +378,7 @@ sns.displot(df["full_area"], kind="kde")
 sns.scatterplot(data=df, x="full_area", y="price_rub", hue="region", alpha=0.6)
 ```
 
-![Зависимость цены от площади](lab-02/plot_03_scatter_area_price.png)
+![Рисунок 3 - Зависимость цены от площади](lab-02/plot_03_scatter_area_price.png)
 
 Диаграмма рассеяния подтверждает и детализирует линейную тенденцию,
 выявленную корреляционным анализом. Параметр `hue='region'` окрашивает
@@ -394,9 +394,9 @@ sns.countplot(data=df, x="region")
 sns.countplot(data=df, x="region", hue="renovation")
 ```
 
-![Распределение квартир по районам](lab-02/plot_04_countplot_region.png)
+![Рисунок 4 - Распределение квартир по районам](lab-02/plot_04_countplot_region.png)
 
-![Распределение по району и ремонту](lab-02/plot_05_countplot_region_renovation.png)
+![Рисунок 5 - Распределение по району и ремонту](lab-02/plot_05_countplot_region_renovation.png)
 
 `countplot()` — специализированный тип столбчатой диаграммы, который
 автоматически подсчитывает количество строк для каждого уникального
@@ -412,7 +412,7 @@ df_pair = df[["full_area", "living_area", "kitchen_area", "price_rub", "region"]
 sns.pairplot(df_pair, hue="region", corner=True)
 ```
 
-![Матрица парных диаграмм](lab-02/plot_06_pairplot.png)
+![Рисунок 6 - Матрица парных диаграмм](lab-02/plot_06_pairplot.png)
 
 `pairplot()` строит матрицу диаграмм рассеяния для каждой пары
 признаков. На главной диагонали — кривые плотности распределения
@@ -502,7 +502,7 @@ ax.hist(data["price_rub"] / 1e6, bins=60, color="steelblue", edgecolor="none")
 ax.axvline(right / 1e6, color="red", linewidth=1.5, linestyle="--")
 ```
 
-![Распределение цен до фильтрации](lab-02/plot_07_boxplot_before.png)
+![Рисунок 7 - Распределение цен до фильтрации](lab-02/plot_07_boxplot_before.png)
 
 Гистограмма показывает правостороннюю асимметрию распределения:
 основная масса квартир сосредоточена в диапазоне 8–20 млн руб.,
@@ -519,7 +519,7 @@ left_1, right_1 = m - 3 * s, m + 3 * s
 Осталось после 3σ: 1986 строк (удалено 14)
 ```
 
-![Распределение цен после правила 3σ](lab-02/plot_08_boxplot_3sigma.png)
+![Рисунок 8 - Распределение цен после правила 3σ](lab-02/plot_08_boxplot_3sigma.png)
 
 Правило трёх сигм основано на свойстве нормального распределения:
 99,7% наблюдений укладываются в интервал [μ − 3σ; μ + 3σ]. Метод
@@ -540,7 +540,7 @@ left_2, right_2 = Q1 - 1.5 * (Q3 - Q1), Q3 + 1.5 * (Q3 - Q1)
 Осталось после IQR: 1938 строк (удалено 62)
 ```
 
-![Распределение цен после метода IQR](lab-02/plot_09_boxplot_iqr.png)
+![Рисунок 9 - Распределение цен после метода IQR](lab-02/plot_09_boxplot_iqr.png)
 
 Метод межквартильного размаха (IQR = Q3 − Q1) определяет допустимый
 диапазон как [Q1 − 1.5·IQR; Q3 + 1.5·IQR], опираясь только на
@@ -575,7 +575,7 @@ cluster 1:   422 объекта
 cluster 2:   342 объекта
 ```
 
-![Реальные районы и кластеры KMeans](lab-02/plot_10_clustering.png)
+![Рисунок 10 - Реальные районы и кластеры KMeans](lab-02/plot_10_clustering.png)
 
 Параметр `n_init=10` означает, что алгоритм запускается 10 раз с
 разными случайными начальными центроидами, и сохраняется лучший
@@ -636,7 +636,7 @@ model.fit(X_train, y_train)
 MAE: 3 962 161 руб.
 ```
 
-![Зависимость цены от площади](lab-03/plot_11_scatter_regression.png)
+![Рисунок 11 - Зависимость цены от площади](lab-03/plot_11_scatter_regression.png)
 
 Коэффициент наклона 215 484 руб./м² содержательно интерпретируется
 как средняя рыночная стоимость одного квадратного метра в выборке —
@@ -675,7 +675,7 @@ knn.fit(X_train_scaled, y_train)
 Точность KNN (n=7): 90.64%
 ```
 
-![Ошибки KNN (n=7)](lab-03/plot_12_knn_errors.png)
+![Рисунок 12 - Ошибки KNN (n=7)](lab-03/plot_12_knn_errors.png)
 
 KNN достигает точности 90.64%. Высокий результат объясняется тем,
 что в признаки включён `price_rub`, который практически напрямую
@@ -750,7 +750,7 @@ tree.fit(X_train, y_train)
 |   |   |--- metro_distance_km <= 1.35
 ```
 
-![Матрица парных диаграмм (признаки дерева)](lab-03/plot_13_pairplot_tree_features.png)
+![Рисунок 13 - Матрица парных диаграмм (признаки дерева)](lab-03/plot_13_pairplot_tree_features.png)
 
 Дерево с `max_depth=5`, обученное без признака `price_rub` (только
 `full_area`, `living_area`, `metro_distance_km`, `floor`), показало
