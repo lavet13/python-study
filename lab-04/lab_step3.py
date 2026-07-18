@@ -1,4 +1,5 @@
 import os
+
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 import pandas as pd
@@ -24,9 +25,17 @@ for i, cls in enumerate(coder.classes_):
 print(df[["race", "race_encoded"]].head())
 
 # Кодирование нескольких признаков в цикле:
-cat_cols = ["workclass", "education", "marital-status",
-            "occupation", "relationship", "race", "sex",
-            "native-country", "class"]
+cat_cols = [
+    "workclass",
+    "education",
+    "marital-status",
+    "occupation",
+    "relationship",
+    "race",
+    "sex",
+    "native-country",
+    "class",
+]
 df_encoded = df.copy()
 for col in cat_cols:
     df_encoded[col] = coder.fit_transform(df_encoded[col].astype(str))
@@ -65,9 +74,20 @@ for col in cat_cols:
     df2[col] = coder.fit_transform(df2[col].astype(str))
 
 # Оцениваем важность признаков для предсказания 'education'.
-mas = ["age", "workclass", "fnlwgt", "marital-status",
-       "occupation", "relationship", "race", "sex",
-       "capitalgain", "capitalloss", "hoursperweek", "native-country"]
+mas = [
+    "age",
+    "workclass",
+    "fnlwgt",
+    "marital-status",
+    "occupation",
+    "relationship",
+    "race",
+    "sex",
+    "capitalgain",
+    "capitalloss",
+    "hoursperweek",
+    "native-country",
+]
 
 X_sel = df2[mas].values
 y_sel = df2["education"].values
@@ -77,10 +97,9 @@ rf_sel.fit(X_sel, y_sel)
 
 # feature_importances_ — массив той же длины, что и список признаков.
 importances = rf_sel.feature_importances_
-importance_df = pd.DataFrame({
-    "feature":    mas,
-    "importance": importances
-}).sort_values("importance", ascending=False)
+importance_df = pd.DataFrame({"feature": mas, "importance": importances}).sort_values(
+    "importance", ascending=False
+)
 
 print("\n--- Важность признаков для предсказания 'education' ---")
 print(importance_df.to_string(index=False))

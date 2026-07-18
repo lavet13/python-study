@@ -1,4 +1,5 @@
 import os
+
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 import pandas as pd
@@ -35,7 +36,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 # Если обучить scaler на всех данных — произойдёт утечка информации из теста.
 scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train)
-X_test_scaled  = scaler.transform(X_test)
+X_test_scaled = scaler.transform(X_test)
 
 print("--- Данные после нормирования (первые 3 строки) ---")
 print(X_train_scaled[:3])
@@ -46,7 +47,7 @@ knn1.fit(X_train_scaled, y_train)
 y_pred1 = knn1.predict(X_test_scaled)
 
 acc1 = accuracy_score(y_test, y_pred1)
-cm1  = confusion_matrix(y_test, y_pred1)
+cm1 = confusion_matrix(y_test, y_pred1)
 print(f"\n--- KNN (n_neighbors=1) ---")
 print(f"Точность (accuracy): {acc1:.2%}")
 print("Матрица ошибок:")
@@ -60,7 +61,7 @@ knn7.fit(X_train_scaled, y_train)
 y_pred7 = knn7.predict(X_test_scaled)
 
 acc7 = accuracy_score(y_test, y_pred7)
-cm7  = confusion_matrix(y_test, y_pred7)
+cm7 = confusion_matrix(y_test, y_pred7)
 print(f"\n--- KNN (n_neighbors=7) ---")
 print(f"Точность (accuracy): {acc7:.2%}")
 print("Матрица ошибок:")
@@ -70,13 +71,19 @@ print(cm7)
 # Code = 0 → верно предсказан; 1 → мужчина предсказан как женщина;
 # 2 → женщина предсказана как мужчина.
 df_test_vis = pd.DataFrame(X_test, columns=["capitalgain", "hoursperweek"])
-df_test_vis["sex"]       = y_test
+df_test_vis["sex"] = y_test
 df_test_vis["predicted"] = y_pred7
 df_test_vis["Code"] = 0
-df_test_vis.loc[(df_test_vis["sex"] == "Male")   & (df_test_vis["predicted"] == "Female"), "Code"] = 1
-df_test_vis.loc[(df_test_vis["sex"] == "Female") & (df_test_vis["predicted"] == "Male"),   "Code"] = 2
+df_test_vis.loc[
+    (df_test_vis["sex"] == "Male") & (df_test_vis["predicted"] == "Female"), "Code"
+] = 1
+df_test_vis.loc[
+    (df_test_vis["sex"] == "Female") & (df_test_vis["predicted"] == "Male"), "Code"
+] = 2
 
-sns.scatterplot(data=df_test_vis, x="hoursperweek", y="capitalgain", hue="Code", palette="tab10")
+sns.scatterplot(
+    data=df_test_vis, x="hoursperweek", y="capitalgain", hue="Code", palette="tab10"
+)
 plt.title("Ошибки KNN (n=7): 0=верно, 1=M→F, 2=F→M")
 plt.savefig("plot_12_knn_errors.png", dpi=100, bbox_inches="tight")
 plt.close()

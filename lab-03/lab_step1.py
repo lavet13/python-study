@@ -1,4 +1,5 @@
 import os
+
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 import pandas as pd
@@ -70,7 +71,9 @@ c = model_multi.intercept_
 print(f"\n--- Множественная регрессия ---")
 print(f"Коэффициенты: {model_multi.coef_}")
 print(f"Свободный член: {c:.4f}")
-print(f"Уравнение: capitalgain = {a:.2f}*hoursperweek + {b2:.2f}*education-num + {c:.2f}")
+print(
+    f"Уравнение: capitalgain = {a:.2f}*hoursperweek + {b2:.2f}*education-num + {c:.2f}"
+)
 
 y_pred_multi = model_multi.predict(X_test_m)
 mae_multi = mean_absolute_error(y_test_m, y_pred_multi)

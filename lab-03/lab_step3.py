@@ -1,4 +1,5 @@
 import os
+
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 import pandas as pd
@@ -6,7 +7,11 @@ import numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import SGDClassifier
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, confusion_matrix, precision_recall_fscore_support
+from sklearn.metrics import (
+    accuracy_score,
+    confusion_matrix,
+    precision_recall_fscore_support,
+)
 
 df = pd.read_csv("../learn_dataset.csv", delimiter=",")
 
@@ -25,7 +30,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 # градиентном спуске, который чувствителен к масштабу признаков.
 scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train)
-X_test_scaled  = scaler.transform(X_test)
+X_test_scaled = scaler.transform(X_test)
 
 # ── SGDClassifier (линейный классификатор) ────────────────────────────────────
 # Ищет разделяющую гиперплоскость (прямую в 2D), которая отделяет
@@ -36,7 +41,7 @@ clf.fit(X_train_scaled, y_train)
 y_pred = clf.predict(X_test_scaled)
 
 acc = accuracy_score(y_test, y_pred)
-cm  = confusion_matrix(y_test, y_pred)
+cm = confusion_matrix(y_test, y_pred)
 print(f"--- Линейный классификатор (SGDClassifier) ---")
 print(f"Точность (accuracy): {acc:.2%}")
 print("Матрица ошибок:")
@@ -51,5 +56,7 @@ precision, recall, f1, support = precision_recall_fscore_support(y_test, y_pred)
 print("\n--- Метрики по классам ---")
 classes = clf.classes_
 for i, cls in enumerate(classes):
-    print(f"  {cls}: precision={precision[i]:.3f}, recall={recall[i]:.3f}, "
-          f"f1={f1[i]:.3f}, support={support[i]}")
+    print(
+        f"  {cls}: precision={precision[i]:.3f}, recall={recall[i]:.3f}, "
+        f"f1={f1[i]:.3f}, support={support[i]}"
+    )

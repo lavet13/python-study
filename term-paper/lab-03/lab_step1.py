@@ -1,4 +1,5 @@
 import os
+
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 import pandas as pd
@@ -23,12 +24,16 @@ plt.close()
 X_simple = df1[["full_area"]].values
 y = df1["price_rub"].values
 
-X_train, X_test, y_train, y_test = train_test_split(X_simple, y, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(
+    X_simple, y, test_size=0.2, random_state=42
+)
 
 model = LinearRegression()
 model.fit(X_train, y_train)
 
-print(f"Уравнение: price_rub ≈ {model.coef_[0]:.0f} * full_area + {model.intercept_:.0f}")
+print(
+    f"Уравнение: price_rub ≈ {model.coef_[0]:.0f} * full_area + {model.intercept_:.0f}"
+)
 
 y_pred = model.predict(X_test)
 mae = mean_absolute_error(y_test, y_pred)

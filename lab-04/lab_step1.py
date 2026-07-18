@@ -1,4 +1,5 @@
 import os
+
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 import pandas as pd
@@ -6,7 +7,12 @@ import numpy as np
 from sklearn.tree import DecisionTreeRegressor, export_text
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_absolute_error, accuracy_score, precision_recall_fscore_support, confusion_matrix
+from sklearn.metrics import (
+    mean_absolute_error,
+    accuracy_score,
+    precision_recall_fscore_support,
+    confusion_matrix,
+)
 
 df = pd.read_csv("../learn_dataset.csv", delimiter=",")
 
@@ -58,7 +64,7 @@ rf.fit(X_train_c, y_train_c)
 y_pred_rf = rf.predict(X_test_c)
 
 acc_rf = accuracy_score(y_test_c, y_pred_rf)
-cm_rf  = confusion_matrix(y_test_c, y_pred_rf)
+cm_rf = confusion_matrix(y_test_c, y_pred_rf)
 prec_rf, rec_rf, f1_rf, sup_rf = precision_recall_fscore_support(y_test_c, y_pred_rf)
 
 print(f"\n--- Случайный лес (RandomForest) ---")
@@ -67,7 +73,9 @@ print("Матрица ошибок:")
 print(cm_rf)
 print("Метрики по классам:")
 for i, cls in enumerate(rf.classes_):
-    print(f"  {cls}: precision={prec_rf[i]:.3f}, recall={rec_rf[i]:.3f}, f1={f1_rf[i]:.3f}")
+    print(
+        f"  {cls}: precision={prec_rf[i]:.3f}, recall={rec_rf[i]:.3f}, f1={f1_rf[i]:.3f}"
+    )
 
 # ── 3. Градиентный бустинг ────────────────────────────────────────────────────
 # Бустинг: деревья строятся последовательно, каждое следующее
@@ -77,7 +85,7 @@ gb.fit(X_train_c, y_train_c)
 y_pred_gb = gb.predict(X_test_c)
 
 acc_gb = accuracy_score(y_test_c, y_pred_gb)
-cm_gb  = confusion_matrix(y_test_c, y_pred_gb)
+cm_gb = confusion_matrix(y_test_c, y_pred_gb)
 prec_gb, rec_gb, f1_gb, sup_gb = precision_recall_fscore_support(y_test_c, y_pred_gb)
 
 print(f"\n--- Градиентный бустинг (GradientBoosting) ---")
@@ -86,4 +94,6 @@ print("Матрица ошибок:")
 print(cm_gb)
 print("Метрики по классам:")
 for i, cls in enumerate(gb.classes_):
-    print(f"  {cls}: precision={prec_gb[i]:.3f}, recall={rec_gb[i]:.3f}, f1={f1_gb[i]:.3f}")
+    print(
+        f"  {cls}: precision={prec_gb[i]:.3f}, recall={rec_gb[i]:.3f}, f1={f1_gb[i]:.3f}"
+    )

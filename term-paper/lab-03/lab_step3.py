@@ -1,4 +1,5 @@
 import os
+
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 import pandas as pd
@@ -12,7 +13,9 @@ df = pd.read_csv("../../moscow_housing_study.csv", delimiter=",").dropna()
 X = df[["full_area", "metro_distance_km", "price_rub"]].values
 y = df["price_segment"].values
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
 
 scaler = StandardScaler()
 X_train_s = scaler.fit_transform(X_train)

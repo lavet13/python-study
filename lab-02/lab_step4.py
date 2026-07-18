@@ -1,4 +1,5 @@
 import os
+
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 import pandas as pd
@@ -35,14 +36,17 @@ print(df_clust.head(10))
 fig, axes = plt.subplots(1, 2, figsize=(12, 5))
 
 sns.scatterplot(
-    data=df_clust, x="hoursperweek", y="education-num",
-    hue="sex", ax=axes[0], alpha=0.4
+    data=df_clust, x="hoursperweek", y="education-num", hue="sex", ax=axes[0], alpha=0.4
 )
 axes[0].set_title("Реальный пол")
 
 sns.scatterplot(
-    data=df_clust, x="hoursperweek", y="education-num",
-    hue="label", ax=axes[1], alpha=0.4
+    data=df_clust,
+    x="hoursperweek",
+    y="education-num",
+    hue="label",
+    ax=axes[1],
+    alpha=0.4,
 )
 axes[1].set_title("Кластеры KMeans")
 
@@ -55,18 +59,20 @@ plt.close()
 male_label = df_clust[df_clust["sex"] == "Male"]["label"].mode()[0]
 female_label = 1 - male_label  # вторая метка — для женщин
 
-total_male   = (df_clust["sex"] == "Male").sum()
+total_male = (df_clust["sex"] == "Male").sum()
 total_female = (df_clust["sex"] == "Female").sum()
 
 # Мужчины, предсказанные верно (их метка совпадает с male_label).
 correct_male = ((df_clust["sex"] == "Male") & (df_clust["label"] == male_label)).sum()
 # Мужчины, предсказанные неверно.
-wrong_male   = ((df_clust["sex"] == "Male") & (df_clust["label"] == female_label)).sum()
+wrong_male = ((df_clust["sex"] == "Male") & (df_clust["label"] == female_label)).sum()
 
 # Женщины, предсказанные верно.
-correct_female = ((df_clust["sex"] == "Female") & (df_clust["label"] == female_label)).sum()
+correct_female = (
+    (df_clust["sex"] == "Female") & (df_clust["label"] == female_label)
+).sum()
 # Женщины, предсказанные неверно.
-wrong_female   = ((df_clust["sex"] == "Female") & (df_clust["label"] == male_label)).sum()
+wrong_female = ((df_clust["sex"] == "Female") & (df_clust["label"] == male_label)).sum()
 
 print(f"\nВсего мужчин: {total_male}")
 print(f"  Верно предсказано: {correct_male}")

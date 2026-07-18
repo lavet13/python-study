@@ -6,8 +6,10 @@ np.random.seed(42)
 n_samples = 2000
 
 # 1. Generate core independent physical dimensions
-full_area = np.random.lognormal(mean=3.9, sigma=0.4, size=n_samples) + 15.0 # Min area ~ 20 sqm
-full_area = np.clip(full_area, 18.0, 350.0) # Realistic bounds
+full_area = (
+    np.random.lognormal(mean=3.9, sigma=0.4, size=n_samples) + 15.0
+)  # Min area ~ 20 sqm
+full_area = np.clip(full_area, 18.0, 350.0)  # Realistic bounds
 
 # Establish physical constraint: living area ~ 60% of full area with Gaussian noise
 living_ratio = np.random.normal(loc=0.6, scale=0.08, size=n_samples)
@@ -21,7 +23,7 @@ kitchen_area = full_area * np.clip(kitchen_ratio, 0.08, 0.30)
 num_rooms = np.zeros(n_samples)
 for i in range(n_samples):
     if full_area[i] < 30.0:
-        num_rooms[i] = 0 # Studio
+        num_rooms[i] = 0  # Studio
     elif full_area[i] < 50.0:
         num_rooms[i] = 1
     elif full_area[i] < 80.0:
@@ -39,30 +41,38 @@ metro_distance_km = np.random.exponential(scale=2.5, size=n_samples)
 metro_distance_km = np.clip(metro_distance_km, 0.1, 25.0)
 
 # Categorical allocations
-regions = np.random.choice(['Moscow', 'New_Moscow', 'Moscow_Oblast'], size=n_samples, p=[0.55, 0.20, 0.25])
-renovations = np.random.choice(['None', 'Cosmetic', 'Euro', 'Designer'], size=n_samples, p=[0.20, 0.45, 0.25, 0.10])
-building_types = np.random.choice(['Panel', 'Brick', 'Monolith'], size=n_samples, p=[0.40, 0.35, 0.25])
+regions = np.random.choice(
+    ["Moscow", "New_Moscow", "Moscow_Oblast"], size=n_samples, p=[0.55, 0.20, 0.25]
+)
+renovations = np.random.choice(
+    ["None", "Cosmetic", "Euro", "Designer"], size=n_samples, p=[0.20, 0.45, 0.25, 0.10]
+)
+building_types = np.random.choice(
+    ["Panel", "Brick", "Monolith"], size=n_samples, p=[0.40, 0.35, 0.25]
+)
 
 # Temporal vector: Transaction listings spanning 2024-01-01 to 2026-05-01
-start_date = pd.to_datetime('2024-01-01')
-end_date = pd.to_datetime('2026-05-01')
-time_deltas = np.random.randint(0, int((end_date - start_date).total_seconds()), size=n_samples)
-timestamps = start_date + pd.to_timedelta(time_deltas, unit='s')
+start_date = pd.to_datetime("2024-01-01")
+end_date = pd.to_datetime("2026-05-01")
+time_deltas = np.random.randint(
+    0, int((end_date - start_date).total_seconds()), size=n_samples
+)
+timestamps = start_date + pd.to_timedelta(time_deltas, unit="s")
 
 # 2. Mathematical Price Generation (Base logic + physical interactions)
 # Baseline price per square meter in Moscow: ~250,000 RUB
 base_m2_price = 250000.0
 
 # Apply regional scaling coefficients
-region_coeff = {'Moscow': 1.0, 'New_Moscow': 0.75, 'Moscow_Oblast': 0.55}
+region_coeff = {"Moscow": 1.0, "New_Moscow": 0.75, "Moscow_Oblast": 0.55}
 r_coeffs = np.array([region_coeff[r] for r in regions])
 
 # Apply renovation scaling coefficients
-renovation_coeff = {'None': 0.85, 'Cosmetic': 1.0, 'Euro': 1.18, 'Designer': 1.40}
+renovation_coeff = {"None": 0.85, "Cosmetic": 1.0, "Euro": 1.18, "Designer": 1.40}
 ren_coeffs = np.array([renovation_coeff[rn] for rn in renovations])
 
 # Apply structural quality coefficients
-build_coeff = {'Panel': 0.90, 'Brick': 1.05, 'Monolith': 1.20}
+build_coeff = {"Panel": 0.90, "Brick": 1.05, "Monolith": 1.20}
 b_coeffs = np.array([build_coeff[b] for b in building_types])
 
 # Proximity premium: Exponential decay of price as distance to metro increases
@@ -70,19 +80,26 @@ metro_decay = np.exp(-0.08 * metro_distance_km)
 
 # Compute target regression price with multi-factor multiplicative interactions + Gaussian noise
 noise = np.random.normal(loc=1.0, scale=0.12, size=n_samples)
-price_rub = (full_area * base_m2_price) * r_coeffs * ren_coeffs * b_coeffs * (0.7 + 0.3 * metro_decay) * noise
+price_rub = (
+    (full_area * base_m2_price)
+    * r_coeffs
+    * ren_coeffs
+    * b_coeffs
+    * (0.7 + 0.3 * metro_decay)
+    * noise
+)
 
 # Format prices to realistic integers
 price_rub = np.round(price_rub, -4)
 
 # 3. Inject Missing Values (MAR and MCAR) to test pre-processing
-mask_living = np.random.rand(n_samples) < 0.10 # 10% MCAR missing
+mask_living = np.random.rand(n_samples) < 0.10  # 10% MCAR missing
 living_area[mask_living] = np.nan
 
-mask_kitchen = np.random.rand(n_samples) < 0.08 # 8% MCAR missing
+mask_kitchen = np.random.rand(n_samples) < 0.08  # 8% MCAR missing
 kitchen_area[mask_kitchen] = np.nan
 
-mask_metro = np.random.rand(n_samples) < 0.05 # 5% MCAR missing
+mask_metro = np.random.rand(n_samples) < 0.05  # 5% MCAR missing
 metro_distance_km[mask_metro] = np.nan
 
 # Categorical missingness: 5% of renovations are missing
@@ -109,23 +126,27 @@ for idx in anomaly_idx_c:
 # 5. Define Classification Target: Ordinal Price Segments
 # Calculate clean boundaries on original baseline to ensure mathematical modeling capability
 q33, q66 = np.percentile(price_rub, [33.3, 66.6])
-price_segment = np.where(price_rub <= q33, 'Budget', np.where(price_rub <= q66, 'Standard', 'Premium'))
+price_segment = np.where(
+    price_rub <= q33, "Budget", np.where(price_rub <= q66, "Standard", "Premium")
+)
 
 # 6. Assemble Final Dataframe and Export
-dataset = pd.DataFrame({
-    'id': np.arange(1, n_samples + 1),
-    'timestamp': timestamps,
-    'full_area': np.round(full_area, 1),
-    'living_area': np.round(living_area, 1),
-    'kitchen_area': np.round(kitchen_area, 1),
-    'floor': floor,
-    'num_rooms': num_rooms.astype(int),
-    'metro_distance_km': np.round(metro_distance_km, 3),
-    'region': regions,
-    'renovation': renovations_with_nan,
-    'building_type': building_types,
-    'price_rub': price_rub,
-    'price_segment': price_segment
-})
+dataset = pd.DataFrame(
+    {
+        "id": np.arange(1, n_samples + 1),
+        "timestamp": timestamps,
+        "full_area": np.round(full_area, 1),
+        "living_area": np.round(living_area, 1),
+        "kitchen_area": np.round(kitchen_area, 1),
+        "floor": floor,
+        "num_rooms": num_rooms.astype(int),
+        "metro_distance_km": np.round(metro_distance_km, 3),
+        "region": regions,
+        "renovation": renovations_with_nan,
+        "building_type": building_types,
+        "price_rub": price_rub,
+        "price_segment": price_segment,
+    }
+)
 
-dataset.to_csv('moscow_housing_study.csv', index=False)
+dataset.to_csv("moscow_housing_study.csv", index=False)

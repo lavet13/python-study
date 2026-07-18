@@ -241,9 +241,16 @@ var doc = new Document({
 // insideH = internal horizontal lines (between rows)
 // insideV = internal vertical lines (between columns)
 // w:sz="4" = 0.5pt border thickness (sz is in eighths of a point)
+//
+// IMPORTANT: In a w:style of type="table", paragraph and run defaults
+// MUST be placed inside <w:tblStylePr w:type="wholeTable">, NOT as bare
+// <w:pPr>/<w:rPr> children of <w:style>. Bare pPr/rPr at the style level
+// are valid only for paragraph styles — in a table style they violate the
+// OOXML schema and Word/LibreOffice may ignore or misapply the formatting.
+// Use w:tblStylePr to correctly cascade font and spacing into all cells.
 
 var tableStyleXml = [
-  '<w:style w:type="table" w:styleId="Table">',
+  '<w:style w:type="table" w:customStyle="1" w:styleId="Table">',
   '  <w:name w:val="Table"/>',
   "  <w:tblPr>",
   "    <w:tblBorders>",
@@ -261,15 +268,17 @@ var tableStyleXml = [
   '      <w:right  w:w="108" w:type="dxa"/>',
   "    </w:tblCellMar>",
   "  </w:tblPr>",
-  "  <w:pPr>",
-  '    <w:spacing w:after="0" w:before="0" w:line="276" w:lineRule="auto"/>',
-  '    <w:ind w:firstLine="0"/>',
-  "  </w:pPr>",
-  "  <w:rPr>",
-  '    <w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/>',
-  '    <w:sz w:val="28"/>',
-  '    <w:szCs w:val="28"/>',
-  "  </w:rPr>",
+  '  <w:tblStylePr w:type="wholeTable">',
+  "    <w:pPr>",
+  '      <w:spacing w:before="0" w:after="0" w:line="276" w:lineRule="auto"/>',
+  '      <w:ind w:firstLine="0"/>',
+  "    </w:pPr>",
+  "    <w:rPr>",
+  '      <w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/>',
+  '      <w:sz w:val="24"/>',
+  '      <w:szCs w:val="24"/>',
+  "    </w:rPr>",
+  "  </w:tblStylePr>",
   "</w:style>",
 ].join("\n");
 

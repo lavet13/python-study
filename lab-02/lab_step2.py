@@ -38,5 +38,7 @@ for col in ["workclass", "occupation", "native-country"]:
     df_filled[col] = df_filled[col].fillna(most_frequent)
     print(f"  {col}: пропуски заполнены значением '{most_frequent}'")
 
-print(f"\n--- После заполнения модой: пропусков осталось: {df_filled.isnull().sum().sum()} ---")
+print(
+    f"\n--- После заполнения модой: пропусков осталось: {df_filled.isnull().sum().sum()} ---"
+)
 df_filled.info()

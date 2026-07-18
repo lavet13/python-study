@@ -21,4 +21,4 @@ print("\n--- Описательные статистики (числовые) --
 print(df.describe())
 
 print("\n--- Описательные статистики (категориальные) ---")
-print(df.describe(include='object'))
+print(df.describe(include="object"))

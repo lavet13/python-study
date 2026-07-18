@@ -1,4 +1,5 @@
 import os
+
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 import pandas as pd
@@ -14,7 +15,9 @@ df = pd.read_csv("../../moscow_housing_study.csv", delimiter=",").dropna()
 X = df[["full_area", "metro_distance_km", "price_rub"]].values
 y = df["price_segment"].values
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
 
 scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train)
@@ -34,7 +37,9 @@ df_vis["pred"] = y_pred
 df_vis["error"] = 0
 df_vis.loc[df_vis["true"] != df_vis["pred"], "error"] = 1
 
-sns.scatterplot(data=df_vis, x="full_area", y="price_rub", hue="error", palette="coolwarm")
+sns.scatterplot(
+    data=df_vis, x="full_area", y="price_rub", hue="error", palette="coolwarm"
+)
 plt.title("Ошибки KNN (n=7): 0=верно, 1=ошибка")
 plt.savefig("plot_12_knn_errors.png", dpi=100, bbox_inches="tight")
 plt.close()

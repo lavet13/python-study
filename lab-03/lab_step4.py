@@ -1,4 +1,5 @@
 import os
+
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 import pandas as pd
@@ -7,7 +8,11 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.tree import DecisionTreeClassifier, export_text
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, confusion_matrix, precision_recall_fscore_support
+from sklearn.metrics import (
+    accuracy_score,
+    confusion_matrix,
+    precision_recall_fscore_support,
+)
 
 df = pd.read_csv("../learn_dataset.csv", delimiter=",")
 
@@ -36,8 +41,8 @@ tree_full = DecisionTreeClassifier(random_state=42)
 tree_full.fit(X_train, y_train)
 
 y_pred_full = tree_full.predict(X_test)
-acc_full    = accuracy_score(y_test, y_pred_full)
-cm_full     = confusion_matrix(y_test, y_pred_full)
+acc_full = accuracy_score(y_test, y_pred_full)
+cm_full = confusion_matrix(y_test, y_pred_full)
 print(f"--- Дерево без ограничения глубины ---")
 print(f"Глубина дерева: {tree_full.get_depth()}")
 print(f"Точность (accuracy): {acc_full:.2%}")
@@ -55,8 +60,8 @@ tree3 = DecisionTreeClassifier(max_depth=3, random_state=42)
 tree3.fit(X_train, y_train)
 
 y_pred3 = tree3.predict(X_test)
-acc3    = accuracy_score(y_test, y_pred3)
-cm3     = confusion_matrix(y_test, y_pred3)
+acc3 = accuracy_score(y_test, y_pred3)
+cm3 = confusion_matrix(y_test, y_pred3)
 print(f"\n--- Дерево с max_depth=3 ---")
 print(f"Точность (accuracy): {acc3:.2%}")
 print("Матрица ошибок:")
@@ -70,5 +75,7 @@ precision, recall, f1, support = precision_recall_fscore_support(y_test, y_pred3
 classes = tree3.classes_
 print("\n--- Метрики по классам (max_depth=3) ---")
 for i, cls in enumerate(classes):
-    print(f"  {cls}: precision={precision[i]:.3f}, recall={recall[i]:.3f}, "
-          f"f1={f1[i]:.3f}, support={support[i]}")
+    print(
+        f"  {cls}: precision={precision[i]:.3f}, recall={recall[i]:.3f}, "
+        f"f1={f1[i]:.3f}, support={support[i]}"
+    )

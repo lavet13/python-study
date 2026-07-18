@@ -23,12 +23,12 @@ if [[ ! -f "$INPUT_DOCX" ]]; then
   exit 1
 fi
 
-cd ~/workspace/python-study
+cd /g/dev/python-study/
 source .venv/bin/activate
 
 echo "Converting: $INPUT_DOCX → $OUTPUT_TXT"
 
-python3 -c '
+python -c '
 from docx import Document
 import sys
 

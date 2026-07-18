@@ -1,4 +1,5 @@
 import os
+
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 import pandas as pd
@@ -33,9 +34,9 @@ print("(столбец 0 = Female, столбец 1 = Male)")
 # Добавляем вероятности в датасет как отдельные столбцы.
 # Индексы 0 и 1 соответствуют классам в rf.classes_ (Female=0, Male=1).
 df_test = pd.DataFrame(X_test, columns=features)
-df_test["sex_real"]       = y_test
-df_test["prob_Female"]    = result[:, 0]
-df_test["prob_Male"]      = result[:, 1]
+df_test["sex_real"] = y_test
+df_test["prob_Female"] = result[:, 0]
+df_test["prob_Male"] = result[:, 1]
 
 print("\n--- Первые 10 строк с вероятностями ---")
 print(df_test[["sex_real", "prob_Female", "prob_Male"]].head(10))

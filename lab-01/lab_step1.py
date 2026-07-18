@@ -53,4 +53,4 @@ print(df.describe())
 # top    — значение, которое встречается чаще всего (мода)
 # freq   — сколько раз это значение встречается в датасете
 print("\n--- Описательные статистики (категориальные) ---")
-print(df.describe(include='str'))
+print(df.describe(include="str"))

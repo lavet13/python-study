@@ -1,0 +1,83 @@
+Скиндер Иван Павлович
+студент I-го курса магистратуры,
+кафедра экономической кибернетики,
+ФГБОУ ВО «Донецкий национальный технический университет»,
+e-mail: lavet13@mail.ru
+г. Донецк, Донецкая Народная Республика, Россия
+Харитонов Юрий Евгеньевич,
+кандидат технических наук, доцент
+кафедры экономической кибернетики
+ФГБОУ ВО «Донецкий национальный технический университет»,
+e-mail: u-e-c-h-a-r@yandex.ru
+г. Донецк, Донецкая Народная Республика, Россия
+МОДЕЛИРОВАНИЕ ДИНАМИЧЕСКОЙ ДОСТУПНОСТИ МЕСТ И УПРАВЛЕНИЕ РЕЙСАМИ В СИСТЕМЕ ОНЛАЙН-БРОНИРОВАНИЯ АВТОБУСНЫХ ПЕРЕВОЗОК НА БАЗЕ POTHOS, PRISMA И RELAY MODERN
+УДК 004.738.5
+Аннотация:
+В работе представлен практический опыт перепроектирования архитектуры веб-платформы для онлайн-бронирования автобусных билетов. Основное внимание уделено созданию такой модели данных и серверной части, которая позволяет менеджеру самостоятельно принимать решения о времени отправления и количестве автобусов на каждом рейсе в зависимости от реальной загрузки. Переход от традиционного подхода schema-first с использованием библиотеки graphql-tools к современному code-first подходу на базе Pothos в сочетании с плагинами Prisma и Relay, а также сервером GraphQL Yoga 4, значительно сократил объём вспомогательного кода, обеспечил полную типобезопасность и дал возможность получать обновления доступности мест в реальном времени. Особое место в исследовании занимает механизм агрегации неподтверждённых броней по датам и маршрутам, который формирует понятные рекомендации для менеджера без автоматического запуска рейсов системой.
+Ключевые слова:
+GraphQL, Pothos, Prisma, Relay Modern, code-first подход, динамическое управление расписанием, human-in-the-loop, пассажирские перевозки, TypeScript, система поддержки принятия решений.
+Введение. В условиях работы малого и среднего автопарка, где в распоряжении компании находится всего два-три автобуса, расписание не может быть жёстко зафиксировано заранее. Время отправления и количество транспортных средств на конкретном направлении определяет именно менеджер, ориентируясь на текущую загрузку. Традиционные системы, построенные по принципу schema-first с использованием языка определения схемы SDL и библиотеки graphql-tools, требуют постоянного ручного поддержания соответствия между описанием API, резолверами и клиентской частью. Это приводит к росту технического долга и появлению ошибок на этапе выполнения.
+Для решения указанных задач в настоящей работе реализован переход на code-first подход. Под code-first понимается генерация GraphQL-схемы непосредственно из TypeScript-кода без написания отдельных файлов SDL. Основным инструментом выбран фреймворк Pothos, который в связке с официальными плагинами @pothos/plugin-prisma и @pothos/plugin-relay автоматически создаёт все конструкции, необходимые для клиента Relay Modern [2]. Relay Modern представляет собой высокопроизводительный GraphQL-клиент, строго следующий спецификациям Relay, включая глобальный интерфейс Node, cursor-based пагинацию и поддержку live-запросов [5]. Серверная часть построена на GraphQL Yoga 4 — лёгком и высокопроизводительном сервере на базе Envelop [1]. Такой стек позволяет полностью исключить запуск relay-compiler и обеспечить 100-процентную типобезопасность на этапе компиляции.
+Цель исследования состоит в демонстрации того, как предложенная архитектура решает ключевую проблему связывания желаемой даты пассажира с реальным рейсом, создаваемым менеджером.
+Основная часть. Центральным элементом новой модели данных стала сущность Trip, которая представляет собой конкретный рейс, полностью контролируемый человеком. Для примера структура этой сущности в Prisma-схеме выглядит следующим образом:
+model Trip {
+id                String      @id @default(cuid())
+routeId           String
+route             Route       @relation(fields: [routeId], references: [id])
+departureDateTime DateTime    // время, выбранное менеджером вручную
+busesCount        Int         @default(1)   // сколько автобусов отправить по решению менеджера
+seatsPerBus       Int         @default(45)
+totalSeats        Int
+bookedSeats       Int         @default(0)
+availableSeats    Int         @default(0)
+status            TripStatus  @default(PLANNED)
+bookings          Booking[]
+createdAt         DateTime    @default(now())
+updatedAt         DateTime    @updatedAt
+}
+Таблица Booking при этом дополнена двумя важными полями. Первое поле — requestedDate — хранит желаемую дату, которую указал пассажир при оформлении заявки. Второе поле — tripId — остаётся пустым до того момента, пока менеджер не создаст соответствующий рейс и не привяжет к нему накопившиеся заявки. Благодаря такому разделению система чётко отличает предварительный спрос от уже подтверждённого рейса.
+Для отображения информации на дашборде менеджера используется механизм группировки записей из таблицы Booking. Конкретный запрос в Prisma, который формирует данные для дашборда, можно записать так:
+const pendingDemand = await prisma.booking.groupBy({
+by: ['routeId', 'requestedDate'],
+where: {
+tripId: null,
+status: 'PENDING'
+},
+_sum: { seatsCount: true },
+_count: { id: true }
+});
+На экране появляется понятная карточка, например: «Донецк — Москва, 5 апреля 2026 года. Забронировано 27 мест в 8 заявках. Рекомендуется отправить один автобус». Менеджер видит реальную загрузку ещё до создания самого рейса. После нажатия кнопки «Создать рейс» система формирует запись в таблице Trip, автоматически привязывает все подходящие брони и пересчитывает количество свободных мест.
+Поле busesCount в сущности Trip отражает именно решение менеджера на конкретный день и направление. Даже при наличии в парке всего двух автобусов можно отправить два транспортных средства одновременно или с небольшим интервалом по одному популярному маршруту. Система предлагает расчёт на основе накопленного спроса, однако окончательное количество автобусов всегда выбирает человек. Такой подход получил название human-in-the-loop, что подразумевает обязательное участие специалиста в процессе принятия решений.
+Внедрение Pothos совместно с плагинами Prisma и Relay позволило получить живые обновления. Как только поступает новая бронь, дашборд у всех менеджеров мгновенно меняет цифры без перезагрузки страницы. Для примера формирования схемы в Pothos используется следующий фрагмент кода:
+builder.prismaObject('Trip', {
+fields: t => ({
+departureDateTime: t.exposeDateTime('departureDateTime'),
+busesCount: t.exposeInt('busesCount'),
+availableSeats: t.exposeInt('availableSeats'),
+})
+});
+По данным независимого исследования 2025 года, использование Pothos с GraphQL Yoga 4 и оптимизацией graphql-jit даёт прирост производительности до 13,6 процента по количеству обрабатываемых запросов в секунду по сравнению с традиционным schema-first подходом, а время холодного старта сокращается более чем в два раза [3].
+Выводы. Предложенная архитектура на базе Pothos, Prisma и Relay Modern создаёт гибкую систему поддержки принятия решений для пассажирских автобусных перевозок. Менеджер получает полную свободу в выборе времени отправления и количества автобусов, сохраняя при этом актуальную информацию о загрузке в реальном времени. Переход на code-first подход существенно сокращает объём кода, устраняет класс ошибок, связанных с рассинхронизацией схемы и реализации, и делает дальнейшую поддержку проекта значительно проще. Полученные результаты могут быть использованы при разработке аналогичных цифровых платформ в сфере транспортной логистики.
+СПИСОК ИСПОЛЬЗОВАННЫХ ИСТОЧНИКОВ
+GraphQL Yoga 4 Documentation. URL: https://the-guild.dev/graphql/yoga-server/docs (дата обращения: 28.03.2026).
+Pothos GraphQL Documentation. URL: https://pothos-graphql.dev (дата обращения: 28.03.2026).
+Tomek Dev. Benchmarking GraphQL solutions in the JS/TS landscape. 2025. URL: https://tomekdev.com/posts/benchmarking-graphql-solutions-in-the-js-ts-landscape (дата обращения: 28.03.2026).
+Prisma ORM Documentation. URL: https://www.prisma.io/docs (дата обращения: 28.03.2026).
+Relay Modern Client Documentation. URL: https://relay.dev (дата обращения: 28.03.2026).
+Skinder Ivan Pavlovich
+Master’s student (1st year)
+Department of Economic Cybernetics
+Donetsk National Technical University
+e-mail: lavet13@mail.ru
+Donetsk, Donetsk People’s Republic, Russia
+Kharitonov Yuri Evgenievich
+Candidate of Technical Sciences, Associate Professor
+Department of Economic Cybernetics
+Donetsk National Technical University
+e-mail: u-e-c-h-a-r@yandex.ru
+Donetsk, Donetsk People’s Republic, Russia
+DYNAMIC SEAT AVAILABILITY MODELING AND FLIGHT MANAGEMENT IN AN ONLINE BUS BOOKING SYSTEM BASED ON POTHOS, PRISMA, AND RELAY MODERN
+Abstract
+The paper presents practical experience in redesigning the architecture of an online bus ticket booking platform. The main focus is on creating a data model and server side that allows the manager to independently decide on the departure time and the number of buses for each trip depending on the actual load. The transition from the traditional schema-first approach using the graphql-tools library to the modern code-first approach based on Pothos in combination with Prisma and Relay plugins, as well as the GraphQL Yoga 4 server, significantly reduced the amount of boilerplate code, ensured full type safety and made it possible to receive real-time seat availability updates. A special place in the study is occupied by the mechanism of aggregating unconfirmed bookings by dates and routes, which generates clear recommendations for the manager without the system automatically launching trips.
+Keywords
+GraphQL, Pothos, Prisma, Relay Modern, code-first approach, dynamic schedule management, human-in-the-loop, passenger transportation, TypeScript, decision support system.

@@ -1,4 +1,5 @@
 import os
+
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 import pandas as pd
@@ -28,7 +29,14 @@ fig, axes = plt.subplots(1, 2, figsize=(14, 6))
 sns.scatterplot(data=df_clust, x="full_area", y="price_rub", hue="region", ax=axes[0])
 axes[0].set_title("Реальные районы")
 
-sns.scatterplot(data=df_clust, x="full_area", y="price_rub", hue="cluster", palette="tab10", ax=axes[1])
+sns.scatterplot(
+    data=df_clust,
+    x="full_area",
+    y="price_rub",
+    hue="cluster",
+    palette="tab10",
+    ax=axes[1],
+)
 axes[1].set_title("Кластеры KMeans")
 
 plt.savefig("plot_10_clustering.png", dpi=100, bbox_inches="tight")
